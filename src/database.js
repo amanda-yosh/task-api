@@ -25,6 +25,19 @@ export class Database {
         return data
     }
 
+    update(table, id, data) {
+        const index = this.#database[table].findIndex(item => item.id === id)
+
+        if (index === -1) return
+
+        this.#database[table][index] = {
+            ...this.#database[table][index],
+            ...data
+        }
+
+        this.#persist()
+    }
+
     insert(table, data) {
         if (!this.#database[table]) {
             this.#database[table] = []
@@ -33,5 +46,11 @@ export class Database {
         this.#persist()
 
         this.#database[table].push(data)
+    }
+
+    delete(table, id) {
+        this.#database[table] = this.#database[table].filter(item => item.id !== id)
+
+        this.#persist()
     }
 }

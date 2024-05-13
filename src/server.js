@@ -1,8 +1,5 @@
-import { randomUUID } from 'node:crypto';
 import http from 'node:http';
-import { Database } from './database.js';
-
-const database = new Database();
+import { routes } from './routes.js';
 
 const server = http.createServer(async (req, res) => {
     const { method, url } = req;
@@ -19,44 +16,19 @@ const server = http.createServer(async (req, res) => {
         req.body = null
     }
 
-    if (method === 'POST' && url === '/tasks') {
-        const { title, description } = req.body;
+    const route = routes.find(route => {
+        return route.method === method && route.path.test(url);
+    })
 
-        const date = new Date().toISOString();
+    if (route) {
+        const routeParameters = req.url.match(route.path)
 
-        const task = {
-            id: randomUUID(),
-            title,
-            description,
-            completed_at: null,
-            created_at: date,
-            updated_at: date
-        }
+        req.params = { ...routeParameters.groups }
 
-        database.insert('tasks')
-        database.insert('tasks', task)
-
-        return res.writeHead(201).end()
+        return route.handler(req, res);
     }
 
-    // - Listagem de todas as tasks
-    if (method === 'GET') {
-        res.write('List tasks');
-    }
-
-    // - Atualização de uma task pelo `id`
-    if (method === 'PUT') { }
-
-    // - Remover uma task pelo `id`
-    if (method === 'DELETE') { }
-
-    // - Marcar pelo `id` uma task como completa
-    if (method === 'PATCH') { }
-
-    // - E o verdadeiro desafio: Importação de tasks em massa por um arquivo CSV
-    if (method === 'POST' && req.url === '/import') { }
+    return res.writeHead(404).end()
 });
 
-server.listen(3000, () => {
-    console.log('Server is running on port 3000');
-});
+server.listen(3000);
