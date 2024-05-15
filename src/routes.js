@@ -32,7 +32,7 @@ export const routes = [
         method: 'GET',
         path: buildRoutePath('/tasks'),
         handler: (req, res) => {
-            const tasks = database.select('tasks')
+            const tasks = database.select('tasks', req.query ? req.query : undefined);
 
             return res
                 .setHeader('Content-type', 'application/json')
