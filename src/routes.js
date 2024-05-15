@@ -63,7 +63,7 @@ export const routes = [
     },
     {
         method: 'PATCH',
-        path: buildRoutePath('/tasks/:id'),
+        path: buildRoutePath('/tasks/:id/complete'),
         handler: (req, res) => {
             const { id } = req.params;
 

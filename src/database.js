@@ -37,6 +37,8 @@ export class Database {
 
         if (index === -1) return
 
+        if (Object.keys(data).length > 1) return // only allow updating one field at a time
+
         this.#database[table][index] = {
             ...this.#database[table][index],
             ...data
@@ -56,6 +58,10 @@ export class Database {
     }
 
     delete(table, id) {
+        const index = this.#database[table].findIndex(item => item.id === id)
+
+        if (index === -1) return
+
         this.#database[table] = this.#database[table].filter(item => item.id !== id)
 
         this.#persist()
